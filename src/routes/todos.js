@@ -5,6 +5,15 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   const todos = db.prepare("SELECT * FROM todos").all();
+
+  if (req.query.withComments === "true") {
+    for (const todo of todos) {
+      todo.comments = db
+        .prepare("SELECT id, body FROM comments WHERE todo_id = ?")
+        .all(todo.id);
+    }
+  }
+
   res.json(todos);
 });
 

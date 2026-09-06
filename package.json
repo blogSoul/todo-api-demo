@@ -1,0 +1,19 @@
+{
+  "name": "todo-api-demo",
+  "version": "1.0.0",
+  "description": "3부 강의 실습용 할일 목록(Todo) API 데모 프로젝트",
+  "main": "src/app.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

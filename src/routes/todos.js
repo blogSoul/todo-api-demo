@@ -28,7 +28,7 @@ router.post("/", (req, res) => {
     .prepare("INSERT INTO todos (title, completed) VALUES (?, 0)")
     .run(title);
 
-  res.json({ id: result.lastInsertRowid, title, completed: false });
+  res.status(201).json({ id: result.lastInsertRowid, title, completed: false });
 });
 
 router.patch("/:id", (req, res) => {

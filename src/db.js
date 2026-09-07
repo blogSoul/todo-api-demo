@@ -22,6 +22,8 @@ db.exec(`
     body TEXT NOT NULL,
     FOREIGN KEY (todo_id) REFERENCES todos(id)
   );
+
+  CREATE INDEX IF NOT EXISTS idx_comments_todo_id ON comments(todo_id);
 `);
 
 const todoCount = db.prepare("SELECT COUNT(*) AS c FROM todos").get().c;

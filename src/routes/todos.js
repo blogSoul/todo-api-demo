@@ -6,11 +6,25 @@ const router = express.Router();
 router.get("/", (req, res) => {
   const todos = db.prepare("SELECT * FROM todos").all();
 
-  if (req.query.withComments === "true") {
+  if (req.query.withComments === "true" && todos.length > 0) {
+    const ids = todos.map((todo) => todo.id);
+    const placeholders = ids.map(() => "?").join(", ");
+    const comments = db
+      .prepare(
+        `SELECT id, todo_id, body FROM comments WHERE todo_id IN (${placeholders})`
+      )
+      .all(...ids);
+
+    const commentsByTodoId = new Map();
+    for (const comment of comments) {
+      if (!commentsByTodoId.has(comment.todo_id)) {
+        commentsByTodoId.set(comment.todo_id, []);
+      }
+      commentsByTodoId.get(comment.todo_id).push({ id: comment.id, body: comment.body });
+    }
+
     for (const todo of todos) {
-      todo.comments = db
-        .prepare("SELECT id, body FROM comments WHERE todo_id = ?")
-        .all(todo.id);
+      todo.comments = commentsByTodoId.get(todo.id) || [];
     }
   }
 

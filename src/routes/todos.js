@@ -42,6 +42,11 @@ router.get("/search", (req, res) => {
 
 router.get("/:id", (req, res) => {
   const todo = db.prepare("SELECT * FROM todos WHERE id = ?").get(req.params.id);
+
+  if (!todo) {
+    return res.status(404).json({ error: "todo를 찾을 수 없습니다." });
+  }
+
   res.json({
     id: todo.id,
     title: todo.title,

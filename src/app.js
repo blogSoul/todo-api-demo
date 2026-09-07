@@ -1,5 +1,6 @@
 const express = require("express");
 const todosRouter = require("./routes/todos");
+const usersRouter = require("./routes/users");
 
 const app = express();
 app.use(express.json());
@@ -9,6 +10,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/todos", todosRouter);
+app.use("/users", usersRouter);
 
 const PORT = process.env.PORT || 3000;
 

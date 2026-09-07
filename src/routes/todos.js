@@ -20,8 +20,8 @@ router.get("/", (req, res) => {
 router.get("/search", (req, res) => {
   const keyword = req.query.keyword || "";
 
-  const sql = `SELECT * FROM todos WHERE title LIKE '%${keyword}%'`;
-  const rows = db.prepare(sql).all();
+  const sql = "SELECT * FROM todos WHERE title LIKE ?";
+  const rows = db.prepare(sql).all(`%${keyword}%`);
 
   res.json(rows);
 });

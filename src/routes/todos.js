@@ -5,11 +5,48 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   const todos = db.prepare("SELECT * FROM todos").all();
+
+  if (req.query.withComments === "true" && todos.length > 0) {
+    const ids = todos.map((todo) => todo.id);
+    const placeholders = ids.map(() => "?").join(", ");
+    const comments = db
+      .prepare(
+        `SELECT id, todo_id, body FROM comments WHERE todo_id IN (${placeholders})`
+      )
+      .all(...ids);
+
+    const commentsByTodoId = new Map();
+    for (const comment of comments) {
+      if (!commentsByTodoId.has(comment.todo_id)) {
+        commentsByTodoId.set(comment.todo_id, []);
+      }
+      commentsByTodoId.get(comment.todo_id).push({ id: comment.id, body: comment.body });
+    }
+
+    for (const todo of todos) {
+      todo.comments = commentsByTodoId.get(todo.id) || [];
+    }
+  }
+
   res.json(todos);
+});
+
+router.get("/search", (req, res) => {
+  const keyword = req.query.keyword || "";
+
+  const sql = "SELECT * FROM todos WHERE title LIKE ?";
+  const rows = db.prepare(sql).all(`%${keyword}%`);
+
+  res.json(rows);
 });
 
 router.get("/:id", (req, res) => {
   const todo = db.prepare("SELECT * FROM todos WHERE id = ?").get(req.params.id);
+
+  if (!todo) {
+    return res.status(404).json({ error: "todo를 찾을 수 없습니다." });
+  }
+
   res.json({
     id: todo.id,
     title: todo.title,
